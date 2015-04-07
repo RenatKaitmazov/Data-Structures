@@ -1,0 +1,92 @@
+public class LinkedList<T> {
+    private Link header;
+    private Link footer;
+    private int count = 0;
+
+    public boolean isEmpty() {
+        return header == null;
+    }
+
+    public int size() {
+        return count;
+    }
+
+    // Insertion at the begging of the list
+    public void insert(T element) {
+        Link newEntry = new Link(element);
+
+        if (isEmpty())
+            footer = newEntry;
+        newEntry.setNext(header);
+        header = newEntry;
+        count++;
+    }
+
+    // Insertion at the end of the list
+    public void append(T element) {
+        Link newEntry = new Link(element);
+
+        if (isEmpty())
+            header = newEntry;
+        else
+            footer.setNext(newEntry);
+        footer = newEntry;
+        count++;
+    }
+
+    public T remove() {
+        if (!isEmpty()) {
+            T temp = (T) header.getElement();
+            if (header.getNext() == null)
+                footer = null;
+            header = header.getNext();
+            count--;
+            return temp;
+        } else {
+            System.out.println("The list is empty.");
+            return null;
+        }
+    }
+    
+    public void removeAll() {
+        header = null;
+        footer = null;
+        count = 0;
+    }
+
+    public T getFirst() {
+        return (T)header.getElement();
+    }
+
+    public T getLast() {
+        return (T)footer.getElement();
+    }
+
+    public T get(T key) {
+        if (!isEmpty()) {
+            Link current = header;
+            while (!current.getElement().equals(key)) {
+                if (current.getNext() == null)
+                    return null;
+                else
+                    current = current.getNext();
+            }
+            return (T)current.getElement();
+        } else {
+            System.out.println("The list is empty.");
+            return null;
+        }
+    }
+
+    public void display() {
+        if (!isEmpty()) {
+            Link current = header;
+            while (current != null) {
+                System.out.printf("%s ", current);
+                current = current.getNext();
+            }
+            System.out.println();
+        } else
+            System.out.println("The list is empty.");
+    }
+}
