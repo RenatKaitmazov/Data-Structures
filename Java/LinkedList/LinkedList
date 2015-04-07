@@ -1,10 +1,10 @@
 public class LinkedList<T> {
-    private Link header;
-    private Link footer;
+    private Link head;
+    private Link tail;
     private int count = 0;
 
     public boolean isEmpty() {
-        return header == null;
+        return head == null;
     }
 
     public int size() {
@@ -16,9 +16,9 @@ public class LinkedList<T> {
         Link newEntry = new Link(element);
 
         if (isEmpty())
-            footer = newEntry;
-        newEntry.setNext(header);
-        header = newEntry;
+            tail = newEntry;
+        newEntry.setNext(head);
+        head = newEntry;
         count++;
     }
 
@@ -27,19 +27,19 @@ public class LinkedList<T> {
         Link newEntry = new Link(element);
 
         if (isEmpty())
-            header = newEntry;
+            head = newEntry;
         else
-            footer.setNext(newEntry);
-        footer = newEntry;
+            tail.setNext(newEntry);
+        tail = newEntry;
         count++;
     }
 
     public T remove() {
         if (!isEmpty()) {
-            T temp = (T) header.getElement();
-            if (header.getNext() == null)
-                footer = null;
-            header = header.getNext();
+            T temp = (T) head.getElement();
+            if (head.getNext() == null)
+                tail = null;
+            head = head.getNext();
             count--;
             return temp;
         } else {
@@ -49,22 +49,22 @@ public class LinkedList<T> {
     }
     
     public void removeAll() {
-        header = null;
-        footer = null;
+        head = null;
+        tail = null;
         count = 0;
     }
 
     public T getFirst() {
-        return (T)header.getElement();
+        return (T)head.getElement();
     }
 
     public T getLast() {
-        return (T)footer.getElement();
+        return (T)tail.getElement();
     }
 
     public T get(T key) {
         if (!isEmpty()) {
-            Link current = header;
+            Link current = head;
             while (!current.getElement().equals(key)) {
                 if (current.getNext() == null)
                     return null;
@@ -80,7 +80,7 @@ public class LinkedList<T> {
 
     public void display() {
         if (!isEmpty()) {
-            Link current = header;
+            Link current = head;
             while (current != null) {
                 System.out.printf("%s ", current);
                 current = current.getNext();
