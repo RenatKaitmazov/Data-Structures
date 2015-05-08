@@ -1,0 +1,48 @@
+package datastructures.array;
+
+/**
+ * Created by RenatKaitmazov on 03/05/15.
+ */
+public class Queue<T> {
+    private T[] queue;
+    private int front;
+    private int rear;
+    private int count;
+
+    public Queue(Class<T> className, int size) {
+        queue = (T[]) java.lang.reflect.Array.newInstance(className, size);
+        front = 0;
+        rear = 0;
+        count = 0;
+    }
+
+    public boolean isEmpty() { return count == 0; }
+    public boolean isFull() { return count == queue.length; }
+    public int elementCount() { return count; }
+    public int size() { return queue.length; }
+
+    public void enqueue(T element) {
+        if (!isFull()) {
+            if (rear == queue.length) rear = 0;
+            queue[rear++] = element;
+            count++;
+        } else
+            System.out.println("The queue is full");
+    }
+
+    public T dequeue() {
+        if (!isEmpty()) {
+            if (front == queue.length) front = 0;
+            count--;
+            return queue[front++];
+        } else
+            return null;
+    }
+
+    public T peek() {
+        if (!isEmpty())
+            return queue[front];
+        else
+            return null;
+    }
+}
