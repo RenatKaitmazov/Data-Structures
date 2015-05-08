@@ -1,0 +1,109 @@
+package datastructures.array;
+
+/**
+ * Created by RenatKaitmazov on 04/05/15.
+ */
+
+public class Array<T> {
+    private T[] data;
+    private int count;
+
+    public Array(Class<T> className, int size) {
+        data = (T[]) java.lang.reflect.Array.newInstance(className, size);
+        count = 0;
+    }
+
+    public boolean isEmpty() { return count == 0; }
+    public boolean isFull() { return count == data.length; }
+    public int size() { return count; }
+    public int freeCells() { return data.length - count; }
+
+    public void insert(T element) {
+        if (!isFull()) {
+            data[count++] = element;
+        } else
+            System.out.println("The list is full");
+    }
+
+    public boolean hasElement(T element) {
+        return find(element) != null;
+    }
+
+    public T find(T key) {
+        if (!isEmpty()) {
+            int i;
+            for (i = 0; i < count; i++)
+                if (data[i] == key)
+                    break;
+
+            if (i == count) return null;
+
+            return data[i];
+        } else {
+            System.out.println("The list is empty");
+            return null;
+        }
+    }
+
+    public T remove(T key) {
+        if (!isEmpty()) {
+            int i;
+            for (i = 0; i < count; i++)
+                if (data[i] == key)
+                    break;
+
+            if (i == count) return null;
+
+            T temp = data[i];
+
+            for (int j = i + 1; j < count; j++)
+                data[j - 1] = data[j];
+            count--;
+            return temp;
+        } else {
+            System.out.println("The list is empty");
+            return null;
+        }
+    }
+
+    public T removeFirst() {
+        if (!isEmpty()) {
+            T temp = data[0];
+
+            for (int i = 1; i < count; i++)
+                data[i - 1] = data[i];
+            count--;
+            return temp;
+        } else {
+            System.out.println("The array is empty");
+            return null;
+        }
+    }
+
+    public T removeLast() {
+        if (!isEmpty()) {
+            return data[--count];
+        } else {
+            System.out.println("The array is empty");
+            return null;
+        }
+    }
+
+    public void display() {
+        if (!isEmpty()) {
+            for (int i = 0; i < count; i++)
+                System.out.format("%s ", data[i]);
+            System.out.println();
+        } else
+            System.out.println("The array is emtpy");
+    }
+
+    public void displayBackward() {
+        if (!isEmpty()) {
+            for (int i = count - 1; i >= 0; i--)
+                System.out.format("%s ", data[i]);
+            System.out.println();
+        } else
+            System.out.println("The array is empty");
+    }
+}
