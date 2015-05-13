@@ -12,17 +12,22 @@ public class LinkedList<T extends Comparable> {
     private int count = 0;
 
                 /* HELPER METHODS */
-    private void connect(Link<T> newLink, Link<T> current) {
+
+    void connect(Link<T> newLink, Link<T> current) {
         newLink.setNext(current.getNext());
         newLink.setPrevious(current);
         newLink.getNext().setPrevious(newLink);
         current.setNext(newLink);
     }
 
-    private void disconnect(Link<T> link) {
+    void disconnect(Link<T> link) {
         link.getPrevious().setNext(link.getNext());
         link.getNext().setPrevious(link.getPrevious());
     }
+
+    void incrementCount() { count++; }
+
+    void decrementCount() { count--; }
                 /* HELPER METHODS */
 
     public boolean isEmpty() { return head == null; }
@@ -191,5 +196,8 @@ public class LinkedList<T extends Comparable> {
         tail = null;
         count = 0;
     }
-                 /* DELETION */
+                /* DELETION */
+
+                /* ITERATOR */
+    public Iterator<T> getIterator() { return new Iterator<>(this); }
 }
