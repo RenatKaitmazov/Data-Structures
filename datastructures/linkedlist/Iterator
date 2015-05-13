@@ -1,0 +1,82 @@
+package datastructures.linkedlist;
+
+/**
+ * Created by RenatKaitmazov on 12/05/15.
+ */
+
+public class Iterator<T extends Comparable> {
+    private LinkedList<T> list;
+    private Link<T> current;
+
+    public Iterator(LinkedList<T> list) {
+        this.list = list;
+        reset();
+    }
+
+    public void reset() { current = list.getHead(); }
+
+    public boolean atEnd() { return current.getNext() == null; }
+
+    public boolean atBeginning() { return current.getPrevious() == null; }
+
+    public void next() {
+        if (atEnd()) return;
+        current = current.getNext();
+    }
+
+    public void previous() {
+        if (atBeginning()) return;
+        current = current.getPrevious();
+    }
+
+    public Link<T> getCurrent() {
+        if (list.isEmpty()) return null;
+        return current;
+    }
+
+    public void insertBefore(T element) {
+        if (list.isEmpty() || atBeginning()) {
+            list.insert(element);
+            reset();
+        } else {
+            Link<T> newLink = new Link<>(element);
+            newLink.setNext(current);
+            newLink.setPrevious(current.getPrevious());
+            newLink.getPrevious().setNext(newLink);
+            current.setPrevious(newLink);
+            list.incrementCount();
+            current = current.getPrevious();
+        }
+    }
+
+    public void insertAfter(T element) {
+        if (list.isEmpty() || atEnd()) {
+            list.append(element);
+            current = list.getTail();
+        } else {
+            list.connect(new Link<>(element), current);
+            list.incrementCount();
+            current = current.getNext();
+        }
+    }
+
+    public T delete() {
+        if (list.isEmpty()) return null;
+
+        if (atBeginning()) {
+            current = current.getNext();
+            return list.delete().getData();
+        } else if (atEnd()) {
+            current = current.getPrevious();
+            return list.deleteLast().getData();
+        } else {
+            T tempData = current.getData();
+            Link<T> tempLink = current.getPrevious();
+            list.disconnect(current);
+            list.disconnect(current);
+            current = tempLink;
+            list.decrementCount();
+            return tempData;
+        }
+    }
+}
