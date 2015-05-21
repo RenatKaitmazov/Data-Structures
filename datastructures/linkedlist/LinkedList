@@ -172,22 +172,23 @@ public class LinkedList<T extends Comparable> {
         if (index == 0) return delete();
         else if (index == count - 1) return deleteLast();
         else {
+            Link<T> current = head;
             Link<T> temp;
+            
             if (index >= count / 2) {
-                temp = tail;
+                current = tail;
                 for (int i = count - 1; i > index; i--)
-                    temp = temp.getPrevious();
-                disconnect(temp);
-                count--;
-                return temp;
+                    current = current.getPrevious();
+                temp = current;
             } else {
-                temp = head;
                 for (int i = 0; i < index; i++)
-                    temp = temp.getNext();
-                disconnect(temp);
-                count--;
-                return temp;
+                    current = current.getNext();
+                temp = current;
             }
+            
+            disconnect(current);
+            count--;
+            return temp;
         }
     }
 
