@@ -1,0 +1,195 @@
+package datastructures.tree;
+
+/**
+ * Created by RenatKaitmazov on 14/05/15.
+ */
+
+public class Tree<T extends Comparable> {
+    private Node<T> root = null;
+
+    private int size(Node<T> node) {
+        if (node == null) return 0;
+        return 1 + size(node.getLeftChild()) + size(node.getRightChild());
+    }
+
+    private void displayInOrder(Node<T> node) {
+        if (node != null) {
+            displayInOrder(node.getLeftChild());
+            System.out.format("%s ", node);
+            displayInOrder(node.getRightChild());
+        }
+    }
+
+
+    private Node<T> getReplacementNode(Node<T> current) {
+        Node<T> replacementNode = current.getRightChild();
+
+        while (replacementNode.hasLeftChild())
+            replacementNode = replacementNode.getLeftChild();
+
+        if (replacementNode != current.getRightChild()) {
+            replacementNode.getParent().setLeftChild(replacementNode.getRightChild());
+            replacementNode.getRightChild().setParent(replacementNode.getParent());
+            replacementNode.setRightChild(current.getRightChild());
+        }
+
+        current.getRightChild().setParent(replacementNode);
+
+        return replacementNode;
+    }
+
+    public Node<T> getRoot() { return root; }
+
+    public void displayInOrder() {
+        displayInOrder(root);
+    }
+
+    public boolean isEmpty() { return root == null; }
+
+    public int size() { return size(root); }
+
+    public void deleteAll() { root = null; }
+
+    public Node<T> find(T key) {
+        if (isEmpty())
+            return null;
+        else {
+            Node<T> current = root;
+
+            while (key != current.getData()) {
+                if (key.compareTo(current.getData()) < 0)
+                    current = current.getLeftChild();
+                else
+                    current = current.getRightChild();
+
+                if (current == null) return null;
+            }
+
+            return current;
+        }
+    }
+
+    public boolean contains(T element) { return find(element) != null; }
+
+    public void insert(T element) {
+        Node<T> newNode = new Node<>(element);
+
+        if (isEmpty())
+            root = newNode;
+        else {
+            Node<T> currentParent = root;
+            while (true) {
+                if (element.compareTo(currentParent.getData()) < 0) {
+                    if (currentParent.hasLeftChild())
+                        currentParent = currentParent.getLeftChild();
+                    else {
+                        currentParent.setLeftChild(newNode);
+                        newNode.setParent(currentParent);
+                        return;
+                    }
+                } else {
+                    if (currentParent.hasRightChild())
+                        currentParent = currentParent.getRightChild();
+                    else {
+                        currentParent.setRightChild(newNode);
+                        newNode.setParent(currentParent);
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
+    public Node<T> getMinimum() {
+        if (isEmpty())
+            return null;
+        else {
+            Node<T> currentParent = root;
+
+            while (currentParent.hasLeftChild())
+                currentParent = currentParent.getLeftChild();
+
+            return currentParent;
+        }
+    }
+
+    public Node<T> getMaximum() {
+        if (isEmpty())
+            return null;
+        else {
+            Node<T> currentParent = root;
+
+            while (currentParent.hasRightChild())
+                currentParent = currentParent.getRightChild();
+
+            return currentParent;
+        }
+    }
+
+    public Node<T> delete(T element) {
+        Node<T> current = root;
+
+        while (current != null && current.getData() != element) {
+            if (element.compareTo(current.getData()) < 0)
+                current = current.getLeftChild();
+            else
+                current = current.getRightChild();
+        }
+
+        if (current == null) return null;
+
+        if (current.isLeafNode()) {
+
+            if (current == root) root = null;
+            else if (current.isLeftChild(current)) current.getParent().setLeftChild(null);
+            else current.getParent().setRightChild(null);
+
+        } else if (current.getRightChild() == null) {
+
+            if (current == root) {
+                current.getLeftChild().setParent(null);
+                root = root.getLeftChild();
+            } else if (current.isLeftChild(current)) {
+                current.getParent().setLeftChild(current.getLeftChild());
+                current.getLeftChild().setParent(current.getParent());
+            } else {
+                current.getParent().setRightChild(current.getLeftChild());
+                current.getLeftChild().setParent(current.getParent());
+            }
+
+        } else if (current.getLeftChild() == null) {
+
+            if (current == root) {
+                current.getRightChild().setParent(null);
+                root = root.getRightChild();
+            } else if (current.isLeftChild(current)) {
+                current.getParent().setLeftChild(current.getRightChild());
+                current.getRightChild().setParent(current.getParent());
+            } else {
+                current.getParent().setRightChild(current.getRightChild());
+                current.getRightChild().setParent(current.getParent());
+            }
+
+        } else {
+            Node<T> replacementNode = getReplacementNode(current);
+
+            if (current == root) {
+                root = replacementNode;
+            } else if (current.isLeftChild(current)) {
+                current.getParent().setLeftChild(replacementNode);
+                replacementNode.setParent(current.getParent());
+            } else {
+                current.getParent().setRightChild(replacementNode);
+                replacementNode.setParent(current.getParent());
+            }
+            replacementNode.setLeftChild(current.getLeftChild());
+            current.getLeftChild().setParent(replacementNode);
+        }
+
+        return current;
+    }
+
+    public Node<T> deleteMax() { return delete(getMaximum().getData()); }
+
+    public Node<T> deleteMin() { return delete(getMinimum().getData()); }
+}
