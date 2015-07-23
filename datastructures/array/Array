@@ -1,109 +1,217 @@
-package datastructures.array;
+package datastr.array;
+
+import java.util.Arrays;
 
 /**
- * Created by RenatKaitmazov on 04/05/15.
+ * Created by Renat Kaitmazov on 23/07/15.
  */
 
-public class Array<T> {
-    private T[] data;
-    private int count;
+public final class Array<T extends Comparable> {
 
-    public Array(Class<T> className, int size) {
-        data = (T[]) java.lang.reflect.Array.newInstance(className, size);
-        count = 0;
+    // Instance variables
+    private T[] storage;
+    private int count;
+    final private Class<T> clazz;
+
+
+
+                                    /*** INTERFACE ***/
+
+    // Analog to clone() method
+
+    public Array<T> makeCopy() {
+        Array<T> copy   = new Array<>(clazz, size());
+        copy.storage    = getArray();
+        copy.count      = count;
+        return copy;
     }
+
+    // Constructor
+    public Array(Class<T> clazz, int size) {
+        storage     = (T[]) java.lang.reflect.Array.newInstance(clazz, size);
+        count       = 0;
+        this.clazz  = clazz;
+    }
+
+    /**
+     * @return the actual size of the array
+     */
+    public int size() { return storage.length; }
+
+    /**
+     * @return how many elements there are in the array.
+     */
+    public int elementsCount() { return count; }
 
     public boolean isEmpty() { return count == 0; }
-    public boolean isFull() { return count == data.length; }
-    public int size() { return count; }
-    public int freeCells() { return data.length - count; }
 
-    public void insert(T element) {
+    public boolean isFull() {
+        return count >= storage.length;
+    }
+
+    @Override
+    public String toString() {
+        if (!isEmpty()) {
+            StringBuilder builder = new StringBuilder("[");
+
+            for (int i = 0; i < count; i++) {
+                String value = storage[i].toString();
+                builder.append(value);
+                builder.append(", ");
+            }
+
+            int start = builder.length() - 2;
+            int end = builder.length();
+            builder.replace(start, end, "]");
+
+            return builder.toString();
+        } else
+            return "[]";
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) return true;
+        if (obj == null || !(obj instanceof Array)) return false;
+
+        Array<T> array = (Array<T>)obj;
+        return Arrays.equals(storage, array.getArray());
+    }
+
+    @Override
+    public int hashCode() {
+        int result = 17;
+            result = 31 * result + Arrays.hashCode(storage);
+            result = 31 * result + count;
+        return result;
+    }
+
+                                    /*** Getters ***/
+
+    /**
+     * @return A copy of the array instead of the reference so that the original array can't be modified
+     */
+    public T[] getArray() {
+        T[] copy = (T[]) java.lang.reflect.Array.newInstance(clazz, size());
+        System.arraycopy(storage, 0, copy, 0, count);
+        return copy;
+    }
+
+
+                                    /*** Main operations ***/
+
+                                        /* Insertion */
+
+    /**
+     * Appends a value to the end of the array
+     */
+    public void append(T element) {
+        if (!isFull())
+            storage[count++] = element;
+        else
+            throw new ArrayIndexOutOfBoundsException("Array is full");
+    }
+
+    /**
+     * Inserts an element at specified index
+     */
+    public void insert(T element, int index) {
+        // The index must not be less than 0 or greater than storage.length
+        if (index < 0 || index >= size())
+            throw new IllegalArgumentException("Index is out of bounds");
+
+        // To insert the element at specified index
+        // we need to move each object in the array by one cell to the right
         if (!isFull()) {
-            data[count++] = element;
+
+            // Finding a place to insert the element
+            int i = count;
+            for (; i > index; i--) {
+                storage[i] = storage[i - 1];
+            }
+
+            // After we have found the right place to insert, we insert the element and increment count
+            storage[i] = element;
+            count++;
+
         } else
-            System.out.println("The list is full");
+            throw new ArrayIndexOutOfBoundsException("Array is full");
     }
 
-    public boolean hasElement(T element) {
-        return find(element) != null;
+    /**
+     * Inserts an element at the beginning of the array
+     */
+    public void insert(T element) {
+        insert(element, 0);
     }
 
-    public T find(T key) {
-        if (!isEmpty()) {
-            int i;
-            for (i = 0; i < count; i++)
-                if (data[i] == key)
-                    break;
+                                                /* Modification */
 
-            if (i == count) return null;
-
-            return data[i];
-        } else {
-            System.out.println("The list is empty");
-            return null;
-        }
+    public void modify(T newData, int index) {
+        if (index < 0 || index >= count)
+            throw new IllegalArgumentException("Index is out of bounds");
+        storage[index] = newData;
     }
 
-    public T remove(T key) {
-        if (!isEmpty()) {
-            int i;
-            for (i = 0; i < count; i++)
-                if (data[i] == key)
-                    break;
+                                                /* Searching */
+    public T find(T element) {
+        // This kind of array is not sorted and unfortunately we can't apply binary search algorithm
 
-            if (i == count) return null;
+        T elementToFind = null;
 
-            T temp = data[i];
-
-            for (int j = i + 1; j < count; j++)
-                data[j - 1] = data[j];
-            count--;
-            return temp;
-        } else {
-            System.out.println("The list is empty");
-            return null;
-        }
+        for (int i = 0; i < count; i++)
+            if (storage[i] == element) {
+                elementToFind = storage[i];
+                break;
+            }
+        return elementToFind;
     }
 
-    public T removeFirst() {
-        if (!isEmpty()) {
-            T temp = data[0];
+    public boolean contains(T element) { return find(element) != null; }
 
-            for (int i = 1; i < count; i++)
-                data[i - 1] = data[i];
-            count--;
-            return temp;
-        } else {
-            System.out.println("The array is empty");
-            return null;
-        }
+                                                /* Deletion */
+
+
+    private T removeFromMemory() {
+        // Just decrementing count is not enough. We should assign null to the item being deleted to let the Garbage Collector know
+        // that we don't need the item anymore so that GC could reclaim memory
+        T temp          = storage[--count];
+        storage[count]  = null;
+        return temp;
     }
 
-    public T removeLast() {
-        if (!isEmpty()) {
-            return data[--count];
-        } else {
-            System.out.println("The array is empty");
-            return null;
-        }
+    /**
+     * Removes element from the beginning
+     */
+    public T delete() {
+        if (isEmpty())
+            throw new RuntimeException("Array is empty");
+
+        return delete(0);
     }
 
-    public void display() {
-        if (!isEmpty()) {
-            for (int i = 0; i < count; i++)
-                System.out.format("%s ", data[i]);
-            System.out.println();
-        } else
-            System.out.println("The array is emtpy");
+    public T deleteLast() {
+        if (isEmpty())
+            throw new RuntimeException("Array is empty");
+
+        return removeFromMemory();
     }
 
-    public void displayBackward() {
-        if (!isEmpty()) {
-            for (int i = count - 1; i >= 0; i--)
-                System.out.format("%s ", data[i]);
-            System.out.println();
-        } else
-            System.out.println("The array is empty");
+
+    /**
+     * Removes element at specified index
+     */
+    public T delete(int index) {
+        if (index < 0 || index >= count)
+            throw new IllegalArgumentException("Index is out of bounds");
+
+        T temp = storage[index];
+
+        for (int i = index; i < count - 1; i++)
+            storage[i] = storage[i + 1];
+
+        removeFromMemory();
+
+        return temp;
     }
 }
