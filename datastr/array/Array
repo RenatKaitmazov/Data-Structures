@@ -6,38 +6,34 @@ import java.util.Arrays;
  * Created by Renat Kaitmazov on 23/07/15.
  */
 
-public final class Array<T extends Comparable> {
+public final class Array<T extends Comparable> implements ArrayInterface<T> {
 
     // Instance variables
     private T[] storage;
     private int count;
     final private Class<T> clazz;
 
-    private void checkIndex(int index) {
+                                    /*** PRIVATE HELPER METHODS ***/
+
+    private void indexCheck(int index) {
         // The index must not be less than 0 or greater than count
         if (index < 0 || index >= count)
             throw new IllegalArgumentException("Index is out of bounds");
     }
 
 
+                                    /*** CONSTRUCTORS ***/
 
-                                    /*** INTERFACE ***/
-
-    // Analog to clone() method
-
-    public Array<T> makeCopy() {
-        Array<T> copy   = new Array<>(clazz, size());
-        copy.storage    = getArray();
-        copy.count      = count;
-        return copy;
-    }
-
-    // Constructor
     public Array(Class<T> clazz, int size) {
         storage     = (T[]) java.lang.reflect.Array.newInstance(clazz, size);
         count       = 0;
         this.clazz  = clazz;
     }
+
+                                    /*** INTERFACE ***/
+
+
+                                /*** State information ***/
 
     /**
      * @return the actual size of the array
@@ -54,6 +50,8 @@ public final class Array<T extends Comparable> {
     public boolean isFull() {
         return count >= storage.length;
     }
+
+                            /*** Methods common to all objects ***/
 
     @Override
     public String toString() {
@@ -92,6 +90,15 @@ public final class Array<T extends Comparable> {
         return result;
     }
 
+    // Analog to clone() method
+
+    public Array<T> makeCopy() {
+        Array<T> copy   = new Array<>(clazz, size());
+        copy.storage    = getArray();
+        copy.count      = count;
+        return copy;
+    }
+
                                     /*** Getters ***/
 
     /**
@@ -122,7 +129,7 @@ public final class Array<T extends Comparable> {
      * Inserts an element at specified index
      */
     public void insert(T element, int index) {
-        checkIndex(index);
+        indexCheck(index);
 
         // To insert the element at specified index
         // we need to move each object in the array by one cell to the right
@@ -152,7 +159,7 @@ public final class Array<T extends Comparable> {
                                                 /* Modification */
 
     public void modify(T newData, int index) {
-        checkIndex(index);
+        indexCheck(index);
         storage[index] = newData;
     }
 
@@ -205,7 +212,7 @@ public final class Array<T extends Comparable> {
      * Removes element at specified index
      */
     public T delete(int index) {
-        checkIndex(index);
+        indexCheck(index);
 
         T temp = storage[index];
 
@@ -217,20 +224,20 @@ public final class Array<T extends Comparable> {
         return temp;
     }
 
-                                            /* Getting element */
+                                            /* Getting elements */
 
     public T get(int index) {
         if (!isEmpty()) {
-            checkIndex(index);
+            indexCheck(index);
             return storage[index];
-        } else 
+        } else
             return null;
     }
 
     public T getLast() {
         return !isEmpty() ? storage[count - 1] : null;
     }
-    
+
     public T getFirst() {
         return get(0);
     }
