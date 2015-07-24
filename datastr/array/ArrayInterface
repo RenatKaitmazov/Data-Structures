@@ -16,12 +16,10 @@ public interface ArrayInterface<T extends Comparable> {
     /*** Main operations ***/
 
         /* Insertion */
-    public void append(T element);
     public void insert(T element);
-    public void insert(T element, int index);
 
         /* Searching */
-    public T find(T element);
+    public int find(T element);
     public boolean contains(T element);
 
         /* Deletion */
