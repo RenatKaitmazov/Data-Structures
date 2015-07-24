@@ -6,7 +6,7 @@ import java.util.Arrays;
  * Created by Renat Kaitmazov on 23/07/15.
  */
 
-public final class Array<T extends Comparable> implements ArrayInterface<T> {
+public final class Array<T extends Comparable<T>> implements ArrayInterface<T> {
 
     // Instance variables
     private T[] storage;
