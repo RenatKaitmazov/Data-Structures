@@ -12,7 +12,7 @@ public final class Array<T extends Comparable> implements ArrayInterface<T> {
     private T[] storage;
     private int count;
     final private Class<T> clazz;
-    
+
                                     /*** CONSTRUCTORS ***/
 
     public Array(Class<T> clazz, int size) {
@@ -38,9 +38,7 @@ public final class Array<T extends Comparable> implements ArrayInterface<T> {
 
     public boolean isEmpty() { return count == 0; }
 
-    public boolean isFull() {
-        return count >= storage.length;
-    }
+    public boolean isFull() { return count >= storage.length; }
 
                             /*** Methods common to all objects ***/
 
@@ -105,14 +103,14 @@ public final class Array<T extends Comparable> implements ArrayInterface<T> {
                                     /*** Main operations ***/
 
                                         /* Insertion */
-                                    
+
 
     private void indexCheck(int index) {
         // The index must not be less than 0 or greater than count
         if (index < 0 || index >= count)
             throw new IllegalArgumentException("Index is out of bounds");
     }
-    
+
     /**
      * Appends a value to the end of the array
      */
@@ -120,18 +118,20 @@ public final class Array<T extends Comparable> implements ArrayInterface<T> {
         if (!isFull())
             storage[count++] = element;
         else
-            throw new ArrayIndexOutOfBoundsException("Array is full");
+            throw new RuntimeException("Array is full");
     }
 
     /**
      * Inserts an element at specified index
      */
     public void insert(T element, int index) {
-        indexCheck(index);
+        if (index < 0 || index > count)
+            throw new IllegalArgumentException("Index is out of bounds");
 
         // To insert the element at specified index
         // we need to move each object in the array by one cell to the right
         if (!isFull()) {
+
 
             // Finding a place to insert the element
             int i = count;
@@ -144,7 +144,7 @@ public final class Array<T extends Comparable> implements ArrayInterface<T> {
             count++;
 
         } else
-            throw new ArrayIndexOutOfBoundsException("Array is full");
+            throw new RuntimeException("Array is full");
     }
 
     /**
@@ -162,54 +162,55 @@ public final class Array<T extends Comparable> implements ArrayInterface<T> {
     }
 
                                                 /* Searching */
-    public T find(T element) {
-        // This kind of array is not sorted and unfortunately we can't apply binary search algorithm
+    public int find(T element) {
+        // This kind of array is not sorted and unfortunately we can't apply the binary search algorithm
 
-        T elementToFind = null;
+        if (!isEmpty()) {
 
-        for (int i = 0; i < count; i++)
-            if (storage[i] == element) {
-                elementToFind = storage[i];
-                break;
+            int i = 0;
+            for (; i < count; i++) {
+                if (storage[i] == element)
+                    return i;
             }
-        return elementToFind;
+
+        }
+
+        return -1;
     }
 
-    public boolean contains(T element) { return find(element) != null; }
+    public boolean contains(T element) { return find(element) != -1; }
 
                                                 /* Deletion */
 
 
-    private T removeFromMemory() {
+    private void removeFromMemory() {
         // Just decrementing count is not enough. We should assign null to the item being deleted to let the Garbage Collector know
         // that we don't need the item anymore so that GC could reclaim memory
-        T temp          = storage[--count];
-        storage[count]  = null;
-        return temp;
+//        T temp          = storage[--count];
+//        storage[count]  = null;
+//        return temp;
+        storage[--count] = null;
+    }
+    
+    private void checkStorageEmptiness() {
+        if (isEmpty())
+            throw new RuntimeException("Array is empty");
     }
 
     /**
      * Removes element from the beginning
      */
-    public T delete() {
-        if (isEmpty())
-            throw new RuntimeException("Array is empty");
+    public T delete() { return delete(0); }
 
-        return delete(0);
-    }
-
-    public T deleteLast() {
-        if (isEmpty())
-            throw new RuntimeException("Array is empty");
-
-        return removeFromMemory();
-    }
+    public T deleteLast() { return delete(count - 1); }
 
 
     /**
      * Removes element at specified index
      */
     public T delete(int index) {
+        checkStorageEmptiness();
+
         indexCheck(index);
 
         T temp = storage[index];
@@ -233,7 +234,7 @@ public final class Array<T extends Comparable> implements ArrayInterface<T> {
     }
 
     public T getLast() {
-        return !isEmpty() ? storage[count - 1] : null;
+        return get(count - 1);
     }
 
     public T getFirst() {
