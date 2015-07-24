@@ -13,6 +13,12 @@ public final class Array<T extends Comparable> {
     private int count;
     final private Class<T> clazz;
 
+    private void checkIndex(int index) {
+        // The index must not be less than 0 or greater than storage.length
+        if (index < 0 || index >= count)
+            throw new IllegalArgumentException("Index is out of bounds");
+    }
+
 
 
                                     /*** INTERFACE ***/
@@ -116,9 +122,7 @@ public final class Array<T extends Comparable> {
      * Inserts an element at specified index
      */
     public void insert(T element, int index) {
-        // The index must not be less than 0 or greater than storage.length
-        if (index < 0 || index >= size())
-            throw new IllegalArgumentException("Index is out of bounds");
+        checkIndex(index);
 
         // To insert the element at specified index
         // we need to move each object in the array by one cell to the right
@@ -148,8 +152,7 @@ public final class Array<T extends Comparable> {
                                                 /* Modification */
 
     public void modify(T newData, int index) {
-        if (index < 0 || index >= count)
-            throw new IllegalArgumentException("Index is out of bounds");
+        checkIndex(index);
         storage[index] = newData;
     }
 
@@ -202,8 +205,7 @@ public final class Array<T extends Comparable> {
      * Removes element at specified index
      */
     public T delete(int index) {
-        if (index < 0 || index >= count)
-            throw new IllegalArgumentException("Index is out of bounds");
+        checkIndex(index);
 
         T temp = storage[index];
 
@@ -213,5 +215,23 @@ public final class Array<T extends Comparable> {
         removeFromMemory();
 
         return temp;
+    }
+
+                                            /* Getting element */
+
+    public T get(int index) {
+        if (!isEmpty()) {
+            checkIndex(index);
+            return storage[index];
+        } else 
+            return null;
+    }
+
+    public T getLast() {
+        return !isEmpty() ? storage[count - 1] : null;
+    }
+    
+    public T getFirst() {
+        return get(0);
     }
 }
