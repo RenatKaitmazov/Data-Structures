@@ -12,16 +12,7 @@ public final class Array<T extends Comparable> implements ArrayInterface<T> {
     private T[] storage;
     private int count;
     final private Class<T> clazz;
-
-                                    /*** PRIVATE HELPER METHODS ***/
-
-    private void indexCheck(int index) {
-        // The index must not be less than 0 or greater than count
-        if (index < 0 || index >= count)
-            throw new IllegalArgumentException("Index is out of bounds");
-    }
-
-
+    
                                     /*** CONSTRUCTORS ***/
 
     public Array(Class<T> clazz, int size) {
@@ -114,7 +105,14 @@ public final class Array<T extends Comparable> implements ArrayInterface<T> {
                                     /*** Main operations ***/
 
                                         /* Insertion */
+                                    
 
+    private void indexCheck(int index) {
+        // The index must not be less than 0 or greater than count
+        if (index < 0 || index >= count)
+            throw new IllegalArgumentException("Index is out of bounds");
+    }
+    
     /**
      * Appends a value to the end of the array
      */
