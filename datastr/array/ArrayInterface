@@ -4,7 +4,7 @@ package datastr.array;
  * Created by Renat Kaitmazov on 24/07/15.
  */
 
-public interface ArrayInterface<T extends Comparable> {
+public interface ArrayInterface<T extends Comparable<T>> {
 
     /*** State information ***/
 
