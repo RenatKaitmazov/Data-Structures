@@ -183,13 +183,12 @@ public final class Array<T extends Comparable<T>> implements ArrayInterface<T> {
                                                 /* Deletion */
 
 
-    private void removeFromMemory() {
+    private T removeFromMemory() {
         // Just decrementing count is not enough. We should assign null to the item being deleted to let the Garbage Collector know
         // that we don't need the item anymore so that GC could reclaim memory
-//        T temp          = storage[--count];
-//        storage[count]  = null;
-//        return temp;
-        storage[--count] = null;
+        T temp          = storage[--count];
+        storage[count]  = null;
+        return temp;
     }
     
     private void checkStorageEmptiness() {
