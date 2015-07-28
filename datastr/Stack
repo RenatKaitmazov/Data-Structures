@@ -8,7 +8,6 @@ public interface Stack<T> {
         /*** State information ***/
     public boolean isEmpty();
     public int size();
-    public int elementsCount();
 
         /*** Main operations ***/
     public void push(T element);
