@@ -7,7 +7,6 @@ public interface Queue<T> {
         /*** State information ***/
     public boolean isEmpty();
     public int size();
-    public int elementsCount();
 
         /*** Main operations ***/
     public void enqueue(T element);
