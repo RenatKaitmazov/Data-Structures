@@ -8,7 +8,7 @@ import java.util.Arrays;
 /**
  * Created by RenatKaitmazov on 26/07/15.
  */
-public class ArrayPriorityQueue<T extends Comparable<T>> implements Queue<T> {
+public final class ArrayPriorityQueue<T extends Comparable<T>> implements Queue<T> {
     private static final int INITIAL_SIZE = 16;
 
     private T[] storage;
