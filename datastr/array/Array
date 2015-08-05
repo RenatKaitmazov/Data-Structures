@@ -6,19 +6,17 @@ import java.util.Arrays;
  * Created by Renat Kaitmazov on 23/07/15.
  */
 
-public final class Array<T extends Comparable<T>> implements ArrayInterface<T> {
+public final class Array<T> implements ArrayInterface<T> {
 
     // Instance variables
     private T[] storage;
     private int count;
-    final private Class<T> clazz;
 
                                     /*** CONSTRUCTORS ***/
 
-    public Array(Class<T> clazz, int size) {
-        storage     = (T[]) java.lang.reflect.Array.newInstance(clazz, size);
+    public Array(int size) {
+        storage     = (T[]) new Object[size];
         count       = 0;
-        this.clazz  = clazz;
     }
 
                                     /*** INTERFACE ***/
@@ -82,7 +80,7 @@ public final class Array<T extends Comparable<T>> implements ArrayInterface<T> {
     // Analog to clone() method
 
     public Array<T> makeCopy() {
-        Array<T> copy   = new Array<>(clazz, size());
+        Array<T> copy   = new Array<>(size());
         copy.storage    = getArray();
         copy.count      = count;
         return copy;
@@ -94,7 +92,7 @@ public final class Array<T extends Comparable<T>> implements ArrayInterface<T> {
      * @return A copy of the array instead of the reference so that the original array can't be modified
      */
     public T[] getArray() {
-        T[] copy = (T[]) java.lang.reflect.Array.newInstance(clazz, size());
+        T[] copy = (T[]) new Object[size()];
         System.arraycopy(storage, 0, copy, 0, count);
         return copy;
     }
@@ -169,7 +167,7 @@ public final class Array<T extends Comparable<T>> implements ArrayInterface<T> {
 
             int i = 0;
             for (; i < count; i++) {
-                if (storage[i] == element)
+                if (storage[i].equals(element))
                     return i;
             }
 
