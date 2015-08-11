@@ -1,0 +1,283 @@
+package datastr.tree;
+
+import datastr.tree.Node;
+
+/**
+ * Created by Renat Kaitmazov on 08/08/15.
+ */
+
+public final class BinaryTree<T extends Comparable<T>> {
+    private Node<T> root    = null;
+    private int count       = 0; // we can find out the size of the tree recursively but this approach is more efficient
+
+
+    @Override
+    public String toString() {
+        if (isEmpty()) return "[]";
+
+        StringBuilder builder = new StringBuilder("[");
+        inOrderString(root, builder);
+
+        int start   = builder.length() - 2;
+        int end     = builder.length();
+        builder.replace(start, end, "]");
+
+
+        return builder.toString();
+    }
+
+    private void inOrderString(Node<T> node, StringBuilder builder) {
+        if (node != null) {
+            inOrderString(node.getLeftChild(), builder);
+            builder.append(node.toString()).append(", ");
+            inOrderString(node.getRightChild(), builder);
+        }
+    }
+
+                        /*** State Information ***/
+
+    public int size()               { return count; }
+    public boolean isEmpty()        { return root == null; }
+    public boolean contains(T data) { return find(data) != null; }
+
+                        /*** Main Operations ***/
+
+
+                        /* Insertion */
+
+    public void insert(T data) {
+        ++count;
+
+        Node<T> newNode = new Node<>(data);
+        // To insert a new item, we first need to find an appropriate place
+        // When a tree is empty, we just assign the item to the root node
+        if (isEmpty())
+            root = newNode;
+        else {
+        // If it not, we have to traverse through the tree
+            Node<T> current     = root;
+
+            while (true) {
+                // If the data is less than the current node, we go to the left of the current node
+                if (data.compareTo(current.getData()) < 0) {
+                    if (current.hasLeftChild())
+                        current = current.getLeftChild();
+                    else {
+                        current.setLeftChild(newNode);
+                        return;
+                    }
+                } else {
+                    // If the data is greater or equal to current node, we go to the right of the current node
+                    if (current.hasRightChild())
+                        current = current.getRightChild();
+                    else {
+                        current.setRightChild(newNode);
+                        return;
+                    }
+                }
+            }
+
+        }
+    }
+
+                        /* Searching */
+
+    public Node<T> find(T key) {
+        // The simplest operation
+        if (isEmpty()) return null;
+
+        Node<T> current = root;
+
+        // We traverse through a tree until we find the item
+        while (!current.getData().equals(key)) {
+            if (key.compareTo(current.getData()) < 0)
+                current = current.getLeftChild();
+            else
+                current = current.getRightChild();
+
+            // Couldn't find the item
+            if (current == null) return null;
+        }
+
+        return current;
+    }
+
+
+                        /* Deletion */
+
+    private Node<T> getReplacementNode(Node<T> nodeToDelete) {
+
+        // This operation is involved when finding an appropriate successor to replace a node that
+        // has two child nodes
+
+        Node<T> replacementNode         = nodeToDelete.getRightChild();
+        Node<T> replacementNodeParent   = nodeToDelete;
+
+        while (replacementNode.hasLeftChild()) {
+            replacementNodeParent = replacementNode;
+            replacementNode = replacementNode.getLeftChild();
+        }
+
+
+        if (replacementNode != nodeToDelete.getRightChild()) {
+
+            if (replacementNode.hasRightChild())
+                replacementNodeParent.setLeftChild(replacementNode.getRightChild());
+
+            replacementNode.setRightChild(nodeToDelete.getRightChild());
+        }
+
+        replacementNode.setLeftChild(nodeToDelete.getLeftChild());
+
+        return replacementNode;
+    }
+
+    public T delete(T key) {
+        if (isEmpty()) return null;
+
+        Node<T> nodeToDelete    = root;
+        Node<T> parentNode      = root;
+
+
+        // First, we find the node to delete
+        while (!nodeToDelete.getData().equals(key)) {
+            parentNode = nodeToDelete;
+
+            if (key.compareTo(nodeToDelete.getData()) < 0)
+                nodeToDelete = nodeToDelete.getLeftChild();
+            else
+                nodeToDelete = nodeToDelete.getRightChild();
+
+            if (nodeToDelete == null) return null;
+        }
+
+        --count;
+
+        if (nodeToDelete.isLeafNode()) {
+
+            // If it is a leaf node, that is, does not have any children
+
+            if (nodeToDelete == root)
+                root = null;
+            else if (nodeToDelete.isLeftChildOf(parentNode))
+                parentNode.setLeftChild(null);
+            else
+                parentNode.setRightChild(null);
+
+        } else if (!nodeToDelete.hasRightChild()) {
+
+            // If it has a left node only
+
+            if (nodeToDelete == root)
+                root = root.getLeftChild();
+            else if (nodeToDelete.isLeftChildOf(parentNode))
+                parentNode.setLeftChild(nodeToDelete.getLeftChild());
+            else
+                parentNode.setRightChild(nodeToDelete.getLeftChild());
+
+        } else if (!nodeToDelete.hasLeftChild()) {
+
+            // If it has a right node only
+
+            if (nodeToDelete == root)
+                root = root.getRightChild();
+            else if (nodeToDelete.isLeftChildOf(parentNode))
+                parentNode.setLeftChild(nodeToDelete.getRightChild());
+            else
+                parentNode.setRightChild(nodeToDelete.getRightChild());
+
+        } else {
+
+            // If it has both nodes
+
+            Node<T> replacementNode = getReplacementNode(nodeToDelete);
+
+            if (nodeToDelete == root)
+                root = replacementNode;
+            else if (nodeToDelete.isLeftChildOf(parentNode))
+                parentNode.setLeftChild(replacementNode);
+            else
+                parentNode.setRightChild(replacementNode);
+
+        }
+
+        return nodeToDelete.getData();
+    }
+
+    public T deleteMin() {
+        if (isEmpty()) return null;
+
+        Node<T> current = root;
+        Node<T> parent  = root;
+
+        while (current.hasLeftChild()) {
+            parent = current;
+            current = current.getLeftChild();
+        }
+
+        if (current == root)
+            root = root.getRightChild();
+        else if (current.hasRightChild())
+            parent.setLeftChild(current.getRightChild());
+        else
+            parent.setLeftChild(null);
+
+        --count;
+
+        return current.getData();
+    }
+    public T deleteMax() {
+        if (isEmpty()) return null;
+
+        Node<T> current = root;
+        Node<T> parent  = root;
+
+        while (current.hasRightChild()) {
+            parent = current;
+            current = current.getRightChild();
+        }
+
+
+        if (current == root)
+            root = root.getLeftChild();
+        else if (current.hasLeftChild())
+            parent.setRightChild(current.getLeftChild());
+        else
+            parent.setRightChild(null);
+
+        --count;
+
+        return current.getData();
+    }
+
+
+    /**
+     *
+     * @return the smallest key
+     */
+    public T min() {
+        if (isEmpty()) return null;
+
+        Node<T> current = root;
+
+        while (current.hasLeftChild())
+            current = current.getLeftChild();
+
+        return current.getData();
+    }
+
+    /**
+     *
+     * @return the largest key
+     */
+    public T max() {
+        if (isEmpty()) return null;
+
+        Node<T> current = root;
+
+        while (current.hasRightChild())
+            current = current.getRightChild();
+
+        return current.getData();
+    }
+}
