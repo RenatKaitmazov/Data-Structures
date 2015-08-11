@@ -1,0 +1,34 @@
+package datastr.tree;
+
+/**
+ * Created by Renat Kaitmazov on 08/08/15.
+ */
+
+final class Node<T extends Comparable<T>> {
+
+    private T data;
+    private Node<T> leftChild;
+    private Node<T> rightChild;
+    private boolean isRed = true;
+
+    Node(T data) { this.data = data; }
+
+    @Override
+    public String toString() { return data.toString(); }
+
+    // Getters
+    public T getData()              { return data; }
+    public Node<T> getLeftChild()   { return leftChild; }
+    public Node<T> getRightChild()  { return rightChild; }
+
+    // Setters
+    public void setData(T data)                     { this.data         = data; }
+    public void setLeftChild(Node<T> leftChild)     { this.leftChild    = leftChild; }
+    public void setRightChild(Node<T> rightChild)   { this.rightChild   = rightChild; }
+
+    // Helper methods
+    public boolean hasLeftChild()               { return leftChild      != null; }
+    public boolean hasRightChild()              { return rightChild     != null; }
+    public boolean isLeftChildOf(Node<T> node)  { return node.leftChild == this; }
+    public boolean isLeafNode()                 { return leftChild == null && rightChild == null; }
+}
