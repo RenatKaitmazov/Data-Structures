@@ -7,6 +7,7 @@ package datastr.tree;
 final class Node<T extends Comparable<T>> {
 
     private T data;
+    private Node<T> parent;
     private Node<T> leftChild;
     private Node<T> rightChild;
     private boolean isRed = true;
@@ -25,10 +26,11 @@ final class Node<T extends Comparable<T>> {
     public void setData(T data)                     { this.data         = data; }
     public void setLeftChild(Node<T> leftChild)     { this.leftChild    = leftChild; }
     public void setRightChild(Node<T> rightChild)   { this.rightChild   = rightChild; }
+    public void setParent(Node<T> parent)           { this.parent       = parent; }
 
     // Helper methods
     public boolean hasLeftChild()               { return leftChild      != null; }
     public boolean hasRightChild()              { return rightChild     != null; }
-    public boolean isLeftChildOf(Node<T> node)  { return node.leftChild == this; }
+    public boolean isLeftChild()                { return parent.leftChild == this; }
     public boolean isLeafNode()                 { return leftChild == null && rightChild == null; }
 }
