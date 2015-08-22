@@ -6,7 +6,7 @@ import datastr.tree.Node;
  * Created by Renat Kaitmazov on 08/08/15.
  */
 
-public final class BinaryTree<T extends Comparable<T>> {
+public final class BinarySearchTree<T extends Comparable<T>> {
     private Node<T> root    = null;
     private int count       = 0; // we can find out the size of the tree recursively but this approach is more efficient
 
@@ -64,7 +64,7 @@ public final class BinaryTree<T extends Comparable<T>> {
                         current = current.getLeftChild();
                     else {
                         current.setLeftChild(newNode);
-                        return;
+                        break;
                     }
                 } else {
                     // If the data is greater or equal to current node, we go to the right of the current node
@@ -72,11 +72,12 @@ public final class BinaryTree<T extends Comparable<T>> {
                         current = current.getRightChild();
                     else {
                         current.setRightChild(newNode);
-                        return;
+                        break;
                     }
                 }
             }
 
+            newNode.setParent(current);
         }
     }
 
@@ -159,7 +160,7 @@ public final class BinaryTree<T extends Comparable<T>> {
 
             if (nodeToDelete == root)
                 root = null;
-            else if (nodeToDelete.isLeftChildOf(parentNode))
+            else if (nodeToDelete.isLeftChild())
                 parentNode.setLeftChild(null);
             else
                 parentNode.setRightChild(null);
@@ -170,7 +171,7 @@ public final class BinaryTree<T extends Comparable<T>> {
 
             if (nodeToDelete == root)
                 root = root.getLeftChild();
-            else if (nodeToDelete.isLeftChildOf(parentNode))
+            else if (nodeToDelete.isLeftChild())
                 parentNode.setLeftChild(nodeToDelete.getLeftChild());
             else
                 parentNode.setRightChild(nodeToDelete.getLeftChild());
@@ -181,7 +182,7 @@ public final class BinaryTree<T extends Comparable<T>> {
 
             if (nodeToDelete == root)
                 root = root.getRightChild();
-            else if (nodeToDelete.isLeftChildOf(parentNode))
+            else if (nodeToDelete.isLeftChild())
                 parentNode.setLeftChild(nodeToDelete.getRightChild());
             else
                 parentNode.setRightChild(nodeToDelete.getRightChild());
@@ -194,7 +195,7 @@ public final class BinaryTree<T extends Comparable<T>> {
 
             if (nodeToDelete == root)
                 root = replacementNode;
-            else if (nodeToDelete.isLeftChildOf(parentNode))
+            else if (nodeToDelete.isLeftChild())
                 parentNode.setLeftChild(replacementNode);
             else
                 parentNode.setRightChild(replacementNode);
