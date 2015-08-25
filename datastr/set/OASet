@@ -4,23 +4,50 @@ package datastr.set;
  * Created by Renat Kaitmazov on 18/08/15.
  */
 
+import java.lang.reflect.Array;
+
 /**
  * OA in the name of the class stands for Open Addressing.
  * It uses double hashing method to find an appropriate place for an element to be stored in the array
  */
 
 public final class OASet<T> {
-    /**
-     * This class is going to be used when deleting an item.
-     */
-    private static class DeletedItem {}
-
     private static final int INITIAL_CAPACITY = 31; // If no value is provided in the constructor
 
-    private Object[] storage;
-    private int count = 0;
+    /**
+     * This class is going to be used as a wrapper for storing data.
+     * It has an important boolean field we are going to use when deleting items.
+     * We don't actually delete an item but just mark it as deleted by switching its field.
+     */
+    private static class Item<T> {
+        T data;
+        boolean isDeleted = false;
 
-    public OASet() { storage = new Object[INITIAL_CAPACITY]; }
+        Item(T data) { this.data = data; }
+
+        @Override
+        public String toString()    { return data.toString(); }
+
+        @Override
+        public int hashCode()       { return data.hashCode(); }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || !(o instanceof Item)) return false;
+            Item<T> item = ((Item<T>) o);
+
+            return data.equals(item.data);
+        }
+    }
+
+    private Item<T>[] storage;
+    private int count = 0;
+    private Class clazz; // Need it for toArray() method
+
+    public OASet() {
+        storage = (Item<T>[]) new Item[INITIAL_CAPACITY];
+    }
 
     public OASet(int initialCapacity) {
         /**
@@ -37,7 +64,7 @@ public final class OASet<T> {
         if (initialCapacity == 4) initialCapacity = 5;
 
         int size    = getNearestPrimeNumber(initialCapacity);
-        storage     = new Object[size];
+        storage     = (Item<T>[]) new Item[INITIAL_CAPACITY];
     }
 
     @Override
@@ -48,10 +75,10 @@ public final class OASet<T> {
             StringBuilder builder = new StringBuilder("{");
 
             for (int i = 0; i < storage.length; i++) {
-                T element =(T) storage[i];
+                Item<T> item = storage[i];
 
-                if (element != null && !(element instanceof DeletedItem))
-                    builder.append(element.toString()).append(", ");
+                if (item != null && !item.isDeleted)
+                    builder.append(item.toString()).append(", ");
             }
 
             int start   = builder.length() - 2;
@@ -107,20 +134,20 @@ public final class OASet<T> {
 
         if (count >= storage.length * 0.75) {
             int newSize = getNearestPrimeNumber(storage.length * 2);
-            Object[] newArray = new Object[newSize];
+            Item<T>[] newArray = (Item<T>[]) new Object[INITIAL_CAPACITY];
 
             for (int i = 0; i < storage.length; i++) {
-                T element = (T) storage[i];
-                if (element != null && !(element instanceof DeletedItem)) {
-                    int index = abs(element.hashCode()) % newSize;
-                    int step = calculateStep(element);
+                Item<T> item = storage[i];
+                if (item != null && !item.isDeleted) {
+                    int index = abs(item.hashCode()) % newSize;
+                    int step = calculateStep(item.data);
 
                     while (newArray[index] != null) {
                         index += step;
                         index %= newSize; // Go to the beginning of the array
                     }
 
-                    newArray[index] = element;
+                    newArray[index] = item;
                 }
             }
 
@@ -129,41 +156,44 @@ public final class OASet<T> {
     }
 
     public void insert(T element) {
+        clazz = element.getClass();
         checkFullness();
 
-        int size    = storage.length;
-        int index   = abs(element.hashCode()) % size;
-        int step    = calculateStep(element);
-        T item      = (T) storage[index];
+        Item<T> newItem = new Item<>(element);
+
+        int size        = storage.length;
+        int index       = abs(element.hashCode()) % size;
+        int step        = calculateStep(newItem.data);
+        Item<T> oldItem = storage[index];
 
 
-        while (item != null && !(item instanceof DeletedItem)) {
-            if (item.equals(element))
+        while (oldItem != null && !oldItem.isDeleted) {
+            if (oldItem.data.equals(element))
                 return;
 
             index += step;
             index %= size;
 
-            item = (T) storage[index];
+            oldItem = storage[index];
         }
 
-        storage[index] = element;
+        storage[index] = newItem;
         ++count;
     }
 
     public T delete(T element) {
         if (isEmpty()) return null;
 
-        int size    = storage.length;
-        int index   = abs(element.hashCode()) % size;
-        int step    = calculateStep(element);
+        int size        = storage.length;
+        int index       = abs(element.hashCode()) % size;
+        int step        = calculateStep(element);
 
         while (storage[index] != null) {
-            if (element.equals(storage[index])) {
-                T temp = (T) storage[index];
-                storage[index] = new DeletedItem();
+            if (element.equals(storage[index].data)) {
+                Item<T> item = storage[index];
+                item.isDeleted = true;
                 --count;
-                return temp;
+                return item.data;
             }
 
             index += step;
@@ -181,13 +211,30 @@ public final class OASet<T> {
         int step    = calculateStep(element);
 
         while (storage[index] != null) {
-            if (storage[index].equals(element))
-                return (T)storage[index];
+            if (storage[index].data.equals(element))
+                return storage[index].data;
 
             index += step;
             index %= size;
         }
 
         return null;
+    }
+
+    public T[] toArray() {
+        if (isEmpty()) return null;
+
+        T[] array = (T[]) Array.newInstance(clazz, count);
+
+        for (int i = 0, j = 0; i < storage.length; i++) {
+            if (storage[i] != null && !storage[i].isDeleted)
+                array[j++] = storage[i].data;
+        }
+
+        return array;
+    }
+
+    public void showInfo() {
+        System.out.println(clazz);
     }
 }
