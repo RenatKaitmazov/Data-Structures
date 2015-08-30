@@ -1,7 +1,5 @@
 package datastr.tree;
 
-import java.lang.reflect.Array;
-
 /**
  * Created by Renat Kaitmazov on 17/08/15.
  */
@@ -9,7 +7,6 @@ import java.lang.reflect.Array;
 public final class RedBlackBST<T extends Comparable<T>> {
     private Node<T> root;
     private int count = 0;
-    private Class clazz;
 
     public boolean isEmpty() { return root == null; }
     public int size() { return count; }
@@ -158,7 +155,6 @@ public final class RedBlackBST<T extends Comparable<T>> {
     }
 
     public void insert(T element) {
-        clazz = element.getClass();
         ++count;
         Node<T> newNode = new Node<>(element);
 
