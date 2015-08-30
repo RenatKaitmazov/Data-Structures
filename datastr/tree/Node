@@ -18,9 +18,11 @@ final class Node<T extends Comparable<T>> {
     public String toString() { return data.toString(); }
 
     // Getters
-    public T getData()              { return data; }
-    public Node<T> getLeftChild()   { return leftChild; }
-    public Node<T> getRightChild()  { return rightChild; }
+    public T data()             { return data; }
+    public Node<T> leftChild()  { return leftChild; }
+    public Node<T> rightChild() { return rightChild; }
+    public Node<T> parent()     { return parent; }
+    public boolean isRed()      { return isRed; }
 
     // Setters
     public void setData(T data)                     { this.data         = data; }
@@ -29,8 +31,18 @@ final class Node<T extends Comparable<T>> {
     public void setParent(Node<T> parent)           { this.parent       = parent; }
 
     // Helper methods
-    public boolean hasLeftChild()               { return leftChild      != null; }
-    public boolean hasRightChild()              { return rightChild     != null; }
-    public boolean isLeftChild()                { return parent.leftChild == this; }
-    public boolean isLeafNode()                 { return leftChild == null && rightChild == null; }
+    public boolean hasLeftChild()   { return leftChild      != null; }
+    public boolean hasRightChild()  { return rightChild     != null; }
+    public boolean isLeftChild()    { return parent.leftChild == this; }
+    public boolean isRightChild()   { return parent.rightChild == this; }
+    public boolean isLeafNode()     { return leftChild == null && rightChild == null; }
+    public void flipColor()         { isRed = !isRed; }
+    public void blacken()           { isRed = false; }
+
+    public Node<T> uncle() {
+        Node<T> grand = parent.parent;
+        if (grand == null) return null;
+
+        return parent.isLeftChild() ? grand.rightChild : grand.leftChild;
+    }
 }
