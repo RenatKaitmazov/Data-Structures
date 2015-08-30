@@ -28,9 +28,9 @@ public final class BinarySearchTree<T extends Comparable<T>> {
 
     private void inOrderString(Node<T> node, StringBuilder builder) {
         if (node != null) {
-            inOrderString(node.getLeftChild(), builder);
+            inOrderString(node.leftChild(), builder);
             builder.append(node.toString()).append(", ");
-            inOrderString(node.getRightChild(), builder);
+            inOrderString(node.rightChild(), builder);
         }
     }
 
@@ -54,14 +54,14 @@ public final class BinarySearchTree<T extends Comparable<T>> {
         if (isEmpty())
             root = newNode;
         else {
-        // If it not, we have to traverse through the tree
+        // If not, we have to traverse through the tree
             Node<T> current     = root;
 
             while (true) {
                 // If the data is less than the current node, we go to the left of the current node
-                if (data.compareTo(current.getData()) < 0) {
+                if (data.compareTo(current.data()) < 0) {
                     if (current.hasLeftChild())
-                        current = current.getLeftChild();
+                        current = current.leftChild();
                     else {
                         current.setLeftChild(newNode);
                         break;
@@ -69,7 +69,7 @@ public final class BinarySearchTree<T extends Comparable<T>> {
                 } else {
                     // If the data is greater or equal to current node, we go to the right of the current node
                     if (current.hasRightChild())
-                        current = current.getRightChild();
+                        current = current.rightChild();
                     else {
                         current.setRightChild(newNode);
                         break;
@@ -90,11 +90,11 @@ public final class BinarySearchTree<T extends Comparable<T>> {
         Node<T> current = root;
 
         // We traverse through a tree until we find the item
-        while (!current.getData().equals(key)) {
-            if (key.compareTo(current.getData()) < 0)
-                current = current.getLeftChild();
+        while (!current.data().equals(key)) {
+            if (key.compareTo(current.data()) < 0)
+                current = current.leftChild();
             else
-                current = current.getRightChild();
+                current = current.rightChild();
 
             // Couldn't find the item
             if (current == null) return null;
@@ -111,24 +111,24 @@ public final class BinarySearchTree<T extends Comparable<T>> {
         // This operation is involved when finding an appropriate successor to replace a node that
         // has two child nodes
 
-        Node<T> replacementNode         = nodeToDelete.getRightChild();
+        Node<T> replacementNode         = nodeToDelete.rightChild();
         Node<T> replacementNodeParent   = nodeToDelete;
 
         while (replacementNode.hasLeftChild()) {
             replacementNodeParent = replacementNode;
-            replacementNode = replacementNode.getLeftChild();
+            replacementNode = replacementNode.leftChild();
         }
 
 
-        if (replacementNode != nodeToDelete.getRightChild()) {
+        if (replacementNode != nodeToDelete.rightChild()) {
 
             if (replacementNode.hasRightChild())
-                replacementNodeParent.setLeftChild(replacementNode.getRightChild());
+                replacementNodeParent.setLeftChild(replacementNode.rightChild());
 
-            replacementNode.setRightChild(nodeToDelete.getRightChild());
+            replacementNode.setRightChild(nodeToDelete.rightChild());
         }
 
-        replacementNode.setLeftChild(nodeToDelete.getLeftChild());
+        replacementNode.setLeftChild(nodeToDelete.leftChild());
 
         return replacementNode;
     }
@@ -141,13 +141,13 @@ public final class BinarySearchTree<T extends Comparable<T>> {
 
 
         // First, we find the node to delete
-        while (!nodeToDelete.getData().equals(key)) {
+        while (!nodeToDelete.data().equals(key)) {
             parentNode = nodeToDelete;
 
-            if (key.compareTo(nodeToDelete.getData()) < 0)
-                nodeToDelete = nodeToDelete.getLeftChild();
+            if (key.compareTo(nodeToDelete.data()) < 0)
+                nodeToDelete = nodeToDelete.leftChild();
             else
-                nodeToDelete = nodeToDelete.getRightChild();
+                nodeToDelete = nodeToDelete.rightChild();
 
             if (nodeToDelete == null) return null;
         }
@@ -170,22 +170,22 @@ public final class BinarySearchTree<T extends Comparable<T>> {
             // If it has a left node only
 
             if (nodeToDelete == root)
-                root = root.getLeftChild();
+                root = root.leftChild();
             else if (nodeToDelete.isLeftChild())
-                parentNode.setLeftChild(nodeToDelete.getLeftChild());
+                parentNode.setLeftChild(nodeToDelete.leftChild());
             else
-                parentNode.setRightChild(nodeToDelete.getLeftChild());
+                parentNode.setRightChild(nodeToDelete.leftChild());
 
         } else if (!nodeToDelete.hasLeftChild()) {
 
             // If it has a right node only
 
             if (nodeToDelete == root)
-                root = root.getRightChild();
+                root = root.rightChild();
             else if (nodeToDelete.isLeftChild())
-                parentNode.setLeftChild(nodeToDelete.getRightChild());
+                parentNode.setLeftChild(nodeToDelete.rightChild());
             else
-                parentNode.setRightChild(nodeToDelete.getRightChild());
+                parentNode.setRightChild(nodeToDelete.rightChild());
 
         } else {
 
@@ -202,7 +202,7 @@ public final class BinarySearchTree<T extends Comparable<T>> {
 
         }
 
-        return nodeToDelete.getData();
+        return nodeToDelete.data();
     }
 
     public T deleteMin() {
@@ -213,19 +213,19 @@ public final class BinarySearchTree<T extends Comparable<T>> {
 
         while (current.hasLeftChild()) {
             parent = current;
-            current = current.getLeftChild();
+            current = current.leftChild();
         }
 
         if (current == root)
-            root = root.getRightChild();
+            root = root.rightChild();
         else if (current.hasRightChild())
-            parent.setLeftChild(current.getRightChild());
+            parent.setLeftChild(current.rightChild());
         else
             parent.setLeftChild(null);
 
         --count;
 
-        return current.getData();
+        return current.data();
     }
     public T deleteMax() {
         if (isEmpty()) return null;
@@ -235,20 +235,20 @@ public final class BinarySearchTree<T extends Comparable<T>> {
 
         while (current.hasRightChild()) {
             parent = current;
-            current = current.getRightChild();
+            current = current.rightChild();
         }
 
 
         if (current == root)
-            root = root.getLeftChild();
+            root = root.leftChild();
         else if (current.hasLeftChild())
-            parent.setRightChild(current.getLeftChild());
+            parent.setRightChild(current.leftChild());
         else
             parent.setRightChild(null);
 
         --count;
 
-        return current.getData();
+        return current.data();
     }
 
 
@@ -262,9 +262,9 @@ public final class BinarySearchTree<T extends Comparable<T>> {
         Node<T> current = root;
 
         while (current.hasLeftChild())
-            current = current.getLeftChild();
+            current = current.leftChild();
 
-        return current.getData();
+        return current.data();
     }
 
     /**
@@ -277,8 +277,8 @@ public final class BinarySearchTree<T extends Comparable<T>> {
         Node<T> current = root;
 
         while (current.hasRightChild())
-            current = current.getRightChild();
+            current = current.rightChild();
 
-        return current.getData();
+        return current.data();
     }
 }
