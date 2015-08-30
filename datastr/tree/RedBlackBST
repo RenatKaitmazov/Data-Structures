@@ -1,0 +1,231 @@
+package datastr.tree;
+
+import java.lang.reflect.Array;
+
+/**
+ * Created by Renat Kaitmazov on 17/08/15.
+ */
+
+public final class RedBlackBST<T extends Comparable<T>> {
+    private Node<T> root;
+    private int count = 0;
+    private Class clazz;
+
+    public boolean isEmpty() { return root == null; }
+    public int size() { return count; }
+    public boolean contains(T element) { return get(element) != null; }
+    public int depth() { return depth(root); }
+
+    private int depth(Node<T> node) {
+        if (node == null) return 0;
+        return 1 + Math.max(depth(node.leftChild()), depth(node.rightChild()));
+    }
+
+    @Override
+    public String toString() {
+        if (isEmpty()) return "[]";
+
+        StringBuilder builder = new StringBuilder("[");
+
+        preOrder(root, builder);
+
+        int start   = builder.length() - 2;
+        int end     = builder.length();
+        builder.replace(start, end, "]");
+
+        return builder.toString();
+    }
+
+    private void preOrder(Node<T> node, StringBuilder sb) {
+        if (node != null) {
+            sb.append(node).append(", ");
+            preOrder(node.leftChild(), sb);
+            preOrder(node.rightChild(), sb);
+        }
+    }
+
+    public T get(T element) {
+        Node<T> node = find(element);
+
+        return node != null ? node.data() : null;
+    }
+
+    /********************   INSERTION   ***************************/
+    /**************************************************************/
+
+    private void flipColor(Node<T> parentNode) {
+        // Here we flip the color of the node and its two children.
+        // Thus we restore the black height of the tree
+        if (parentNode != root)
+            parentNode.flipColor();
+        parentNode.leftChild().flipColor();
+        parentNode.rightChild().flipColor();
+    }
+
+    private void rotateRight(Node<T> nodeToRotate) {
+        // When rotating to the right, the node being rotated must have a left child
+        Node<T> left = nodeToRotate.leftChild();
+
+        if (nodeToRotate != root) {
+
+            if (nodeToRotate.isLeftChild())
+                nodeToRotate.parent().setLeftChild(left);
+            else
+                nodeToRotate.parent().setRightChild(left);
+
+            left.setParent(nodeToRotate.parent());
+        } else {
+            left.setParent(null);
+            root = left;
+        }
+
+        if (left.hasRightChild()) {
+            nodeToRotate.setLeftChild(left.rightChild());
+            left.rightChild().setParent(nodeToRotate);
+        } else
+            nodeToRotate.setLeftChild(null);
+
+        left.setRightChild(nodeToRotate);
+        nodeToRotate.setParent(left);
+    }
+
+    private void rotateLeft(Node<T> nodeToRotate) {
+        // When rotating to the left, the node being rotated must have a right child
+        Node<T> right = nodeToRotate.rightChild();
+
+        if (nodeToRotate != root) {
+            if (nodeToRotate.isLeftChild())
+                nodeToRotate.parent().setLeftChild(right);
+            else
+                nodeToRotate.parent().setRightChild(right);
+
+            right.setParent(nodeToRotate.parent());
+        } else {
+            right.setParent(null);
+            root = right;
+        }
+
+        if (right.hasLeftChild()) {
+            nodeToRotate.setRightChild(right.leftChild());
+            right.leftChild().setParent(nodeToRotate);
+        } else
+            nodeToRotate.setRightChild(null);
+
+        right.setLeftChild(nodeToRotate);
+        nodeToRotate.setParent(right);
+    }
+
+    private void balanceTree(Node<T> node) {
+        Node<T> parent = node.parent();
+
+        if (parent != null && parent.isRed()) {
+
+            Node<T> grandParent = parent.parent();
+            Node<T> uncle       = node.uncle();
+
+            if (uncle == null || !uncle.isRed()) {
+
+                grandParent.flipColor();
+
+                if (parent.isLeftChild()) {
+
+                    if (node.isLeftChild())
+                        parent.flipColor();
+                    else {
+                        node.flipColor();
+                        rotateLeft(parent);
+                    }
+
+                    rotateRight(grandParent);
+
+                } else {
+
+                    if (node.isLeftChild()) {
+                        node.flipColor();
+                        rotateRight(parent);
+                    } else
+                        parent.flipColor();
+
+                    rotateLeft(grandParent);
+                }
+
+
+            } else {
+                flipColor(grandParent);
+                balanceTree(grandParent);
+            }
+        }
+    }
+
+    public void insert(T element) {
+        clazz = element.getClass();
+        ++count;
+        Node<T> newNode = new Node<>(element);
+
+        if (isEmpty()) {
+            root = newNode;
+            root.blacken();
+        } else {
+
+            Node<T> current = root;
+
+            while (true) {
+                if (element.compareTo(current.data()) < 0) {
+                    if (current.hasLeftChild())
+                        current = current.leftChild();
+                    else {
+                        current.setLeftChild(newNode);
+                        break;
+                    }
+                } else {
+                    if (current.hasRightChild())
+                        current = current.rightChild();
+                    else {
+                        current.setRightChild(newNode);
+                        break;
+                    }
+                }
+            }
+
+            newNode.setParent(current);
+
+            balanceTree(newNode);
+        }
+    }
+
+    private Node<T> find(T element) {
+        Node<T> current = root;
+
+        while (current != null && !current.data().equals(element)) {
+            if (element.compareTo(current.data()) < 0)
+                current = current.leftChild();
+            else
+                current = current.rightChild();
+        }
+
+        return current != null ? current : null;
+    }
+    
+
+    public T min() {
+        if (isEmpty()) return null;
+
+        Node<T> current = root;
+
+        while (current.hasLeftChild())
+            current = current.leftChild();
+
+        return current.data();
+    }
+
+    public T max() {
+        if (isEmpty()) return null;
+
+        Node<T> current = root;
+
+        while (current.hasRightChild())
+            current = current.rightChild();
+
+        return current.data();
+    }
+}
