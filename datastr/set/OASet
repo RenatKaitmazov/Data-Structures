@@ -51,7 +51,7 @@ public final class OASet<T> {
 
     public OASet(int initialCapacity) {
         /**
-         * Let's imagine that a client want a set of size 4. In this case a set of size 5 will be created instead
+         * Let's imagine that a client wants a set of size 4. In this case a set of size 5 will be created instead
          * since it is the nearest prime number to 4. The calculateStep() method may return 5. If this is the case, now suppose
          * that 0th index is occupied. Now let's have a look at the snippet of code from insert() routine. It looks like this:
          * index   += step;
