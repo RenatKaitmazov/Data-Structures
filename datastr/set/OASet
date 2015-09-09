@@ -12,8 +12,6 @@ import java.lang.reflect.Array;
  */
 
 public final class OASet<T> {
-    private static final int INITIAL_CAPACITY = 31; // If no value is provided in the constructor
-
     /**
      * This class is going to be used as a wrapper for storing data.
      * It has an important boolean field we are going to use when deleting items.
@@ -46,7 +44,7 @@ public final class OASet<T> {
     private Class clazz; // Need it for toArray() method
 
     public OASet() {
-        storage = (Item<T>[]) new Item[INITIAL_CAPACITY];
+        this(31);
     }
 
     public OASet(int initialCapacity) {
@@ -64,7 +62,7 @@ public final class OASet<T> {
         if (initialCapacity == 4) initialCapacity = 5;
 
         int size    = getNearestPrimeNumber(initialCapacity);
-        storage     = (Item<T>[]) new Item[INITIAL_CAPACITY];
+        storage     = (Item<T>[]) new Item[size];
     }
 
     @Override
@@ -134,7 +132,7 @@ public final class OASet<T> {
 
         if (count >= storage.length * 0.75) {
             int newSize = getNearestPrimeNumber(storage.length * 2);
-            Item<T>[] newArray = (Item<T>[]) new Object[INITIAL_CAPACITY];
+            Item<T>[] newArray = (Item<T>[]) new Object[newSize];
 
             for (int i = 0; i < storage.length; i++) {
                 Item<T> item = storage[i];
