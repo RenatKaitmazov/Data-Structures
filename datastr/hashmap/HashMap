@@ -21,6 +21,7 @@ public final class HashMap<K, V> {
 
         public String toString() { return String.format("%s=%s", key.toString(), value.toString()); }
         public int hashCode() { return key.hashCode(); }
+        public boolean contains(K key) { return get(key) != null; }
 
         public boolean equals(Object o) {
             if (o == this) return true;
