@@ -1,0 +1,200 @@
+package datastr.hashmap;
+
+import java.lang.reflect.Array;
+
+/**
+ * Created by Renat Kaitmazov on 10/09/15.
+ */
+
+public final class HashMap<K, V> {
+
+    private class Item<K, V> {
+        private K key;
+        private V value;
+        private boolean isDeleted;
+
+        Item(K key, V value) {
+            this.key = key;
+            this.value = value;
+            isDeleted = false;
+        }
+
+        public String toString() { return String.format("%s=%s", key.toString(), value.toString()); }
+        public int hashCode() { return key.hashCode(); }
+
+        public boolean equals(Object o) {
+            if (o == this) return true;
+            if (o == null || !(o instanceof Item)) return false;
+            Item<K, V> item = ((Item<K, V>) o);
+
+            return key.equals(item.key) && value.equals(item.value);
+        }
+    }
+
+    private Item<K, V>[] items;
+    private int count;
+    private Class keyClass;
+    private Class valueClass;
+
+    public HashMap() { this(31); }
+
+    public HashMap(int initialCapacity) {
+        if (initialCapacity == 4) initialCapacity = 5;
+        int size = getNearestPrimeNumber(initialCapacity);
+        items = (Item<K, V>[]) new Item[size];
+    }
+
+    public String toString() {
+        if (isEmpty()) return "[]";
+
+        StringBuilder builder = new StringBuilder("[");
+
+        for (int i = 0; i < items.length; i++) {
+            Item<K, V> item = items[i];
+
+            if (item != null && !item.isDeleted) builder.append(item).append(", ");
+        }
+
+        int s = builder.length() - 2;
+        int e = builder.length();
+        builder.replace(s, e, "]");
+
+        return builder.toString();
+    }
+
+    public boolean isEmpty() { return count == 0; }
+    public int size() { return count; }
+
+    private int getNearestPrimeNumber(int i) {
+        int prime = i + 1;
+        while (!isPrime(prime)) prime++;
+        return prime;
+    }
+
+    private boolean isPrime(int number) {
+        for (int i = 2; i * i <= number; i++) if (number % i == 0) return false;
+        return true;
+    }
+
+    private int calculateStep(K key) { return  5 - Math.abs(key.hashCode()) % 5; }
+
+    private void checkFullness() {
+        if ((double)count / items.length >= 0.75) {
+            Item<K, V>[] newArray = (Item<K, V>[]) new Item[getNearestPrimeNumber(items.length << 1)];
+
+            for (int i = 0; i < items.length; i++) {
+
+                Item<K, V> item = items[i];
+
+                if (item != null && !item.isDeleted) {
+                    int index = Math.abs(item.hashCode()) % newArray.length;
+                    int step = calculateStep(item.key);
+
+                    while (newArray[index] != null) {
+                        index += step;
+                        index %= newArray.length;
+                    }
+
+                    newArray[index] = item;
+                }
+
+            }
+            items = newArray;
+        }
+    }
+
+    public void insert(K key, V value) {
+        keyClass = key.getClass();
+        valueClass = value.getClass();
+        checkFullness();
+        Item<K, V> newItem = new Item<>(key, value);
+
+        int index = Math.abs(newItem.hashCode()) % items.length;
+        int step = calculateStep(newItem.key);
+
+        while (items[index] != null) {
+            if (items[index].key.equals(key)) {
+                items[index].value = value;
+                return;
+            }
+            if (items[index].isDeleted) break;
+
+            index += step;
+            index %= items.length;
+        }
+
+        items[index] = newItem;
+        ++count;
+    }
+
+    public V get(K key) {
+        if (isEmpty()) return null;
+
+        int index = Math.abs(key.hashCode()) % items.length;
+        int step = calculateStep(key);
+
+        Item<K, V> item = items[index];
+
+        while (item != null && !item.isDeleted) {
+            if (key.equals(item.key)) return item.value;
+
+            index += step;
+            index %= items.length;
+
+            item = items[index];
+        }
+
+        return null;
+    }
+
+    public V delete(K key) {
+        if (isEmpty()) return null;
+
+        int index = Math.abs(key.hashCode()) % items.length;
+        int step = calculateStep(key);
+        Item<K, V> item = items[index];
+
+        while (item != null && !item.isDeleted) {
+            if (item.key.equals(key)) {
+                --count;
+                item.isDeleted = true;
+                return item.value;
+            }
+
+            index += step;
+            index %= items.length;
+
+            item = items[index];
+        }
+
+        return null;
+    }
+
+    public K[] keySet() {
+        if (isEmpty()) return null;
+
+        K[] keySet = (K[]) Array.newInstance(keyClass, count);
+
+        for (int i = 0, j = 0; i < items.length; i++) {
+            Item<K, V> item = items[i];
+
+            if (item != null && !item.isDeleted) keySet[j++] = item.key;
+        }
+
+        return keySet;
+    }
+
+    public V[] values() {
+        if (isEmpty()) return null;
+
+        V[] values = (V[]) Array.newInstance(valueClass, count);
+
+        for (int i = 0, j = 0; i < items.length; i++) {
+            Item<K, V> item = items[i];
+
+            if (item != null && !item.isDeleted) values[j++] = item.value;
+        }
+
+        return values;
+    }
+}
