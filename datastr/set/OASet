@@ -201,7 +201,7 @@ public final class OASet<T> {
         return null;
     }
 
-    public T find(T element) {
+    public T get(T element) {
         if (isEmpty()) return null;
 
         int size    = storage.length;
@@ -209,11 +209,14 @@ public final class OASet<T> {
         int step    = calculateStep(element);
 
         while (storage[index] != null) {
+            if (storage[index].isDeleted || !storage[index].data.equals(element)) {
+                index += step;
+                index %= size;
+                continue;
+            }
+
             if (storage[index].data.equals(element))
                 return storage[index].data;
-
-            index += step;
-            index %= size;
         }
 
         return null;
