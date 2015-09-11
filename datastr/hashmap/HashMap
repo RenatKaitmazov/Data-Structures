@@ -43,7 +43,7 @@ public final class HashMap<K, V> {
     private Class keyClass; // Need it for keySet() method to create a generic array containing keys
     private Class valueClass; // Need it for values() method to create a generic array containing values
 
-    // If no initial capacity provided we create an array of size 31 (29 will eventually become 31)
+    // If no initial capacity is provided we create an array of size 31 (29 will eventually become 31)
     // which is a prime number
     public HashMap() { this(29); }
 
