@@ -1,8 +1,9 @@
 package datastr.linkedlist;
 
 /**
- * Created by RenatKaitmazov on 01/08/15.
+ * Created by Renat Kaitmazov on 01/08/15.
  */
+
 public final class ListIterator<T> implements datastr.Iterable<T> {
     private List<T> list;
     private Link<T> current;
@@ -20,9 +21,9 @@ public final class ListIterator<T> implements datastr.Iterable<T> {
 
                             /*** State Information ***/
 
-    public boolean atEnd()          { return current.getNext() == null; }
-    public boolean atBeginning()    { return current.getPrevious() == null; }
-
+    public boolean atEnd()          { return current == ((LinkedList) list).getTail(); }
+    public boolean atBeginning()    { return current == ((LinkedList) list).getHead(); }
+    public boolean hasNext() { return current.getNext() != null; }
 
                             /*** Main Operations ***/
 
