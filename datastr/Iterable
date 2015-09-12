@@ -9,9 +9,9 @@ public interface Iterable<T> {
             /*** State Information ***/
     public boolean atEnd();
     public boolean atBeginning();
+    public boolean hasNext();
 
-            /*** Main Operations ***
-    public boolean hasNext();            
+            /*** Main Operations ***/
     public void reset();
     public T get();
     public void next();
