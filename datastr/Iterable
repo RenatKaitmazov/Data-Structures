@@ -10,7 +10,8 @@ public interface Iterable<T> {
     public boolean atEnd();
     public boolean atBeginning();
 
-            /*** Main Operations ***/
+            /*** Main Operations ***
+    public boolean hasNext();            
     public void reset();
     public T get();
     public void next();
