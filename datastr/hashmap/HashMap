@@ -43,13 +43,23 @@ public final class HashMap<K, V> {
     private Class keyClass; // Need it for keySet() method to create a generic array containing keys
     private Class valueClass; // Need it for values() method to create a generic array containing values
 
-    // If no initial capacity is provided we create an array of size 31 (29 will eventually become 31)
+    // If no initial capacity provided we create an array of size 31 (29 will eventually become 31)
     // which is a prime number
     public HashMap() { this(29); }
 
     public HashMap(int initialCapacity) {
+        /**
+         * Let's imagine that a client wants a set of size 4. In this case a set of size 5 will be created instead
+         * since it is the nearest prime number to 4. The calculateStep() method may return 5. If this is the case, now suppose
+         * that 0th index is occupied. Now let's have a look at the snippet of code from insert() routine. It looks like this:
+         * index   += step;
+         * index   %= size;
+         * 0 is occupied, so the next index is 0 + 5 = 5 and 5 % 5 = 0.
+         * As you can see this situation can create an infinite loop and to avoid this we should check the size a client want a set to be.
+         * It must not be equal to 4;
+         */
         if (initialCapacity == 4) initialCapacity = 5;
-        int size = getNearestPrimeNumber(initialCapacity);
+        int size = getNearestPrimeNumber(initialCapacity << 1);
         items = (Item<K, V>[]) new Item[size];
     }
 
