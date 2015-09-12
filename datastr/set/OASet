@@ -61,7 +61,7 @@ public final class OASet<T> {
 
         if (initialCapacity == 4) initialCapacity = 5;
 
-        int size    = getNearestPrimeNumber(initialCapacity);
+        int size    = getNearestPrimeNumber(initialCapacity << 1);
         storage     = (Item<T>[]) new Item[size];
     }
 
@@ -89,7 +89,7 @@ public final class OASet<T> {
 
     public boolean isEmpty() { return count == 0; }
     public int size() { return count; }
-    public boolean contains(T element) { return find(element) != null; }
+    public boolean contains(T element) { return get(element) != null; }
 
 
     private int abs(int value) {
