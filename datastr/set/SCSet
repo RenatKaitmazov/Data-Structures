@@ -33,18 +33,6 @@ public final class SCSet<T> implements Set<T> {
 
         StringBuilder builder = new StringBuilder("[");
 
-//        for (int i = 0; i < lists.length; i++) {
-//            LinkedList<T> list = lists[i];
-//            ListIterator<T> iterator = list.getIterator();
-//
-//            if (list != null && !list.isEmpty()) {
-//                for (int j = 0; j < list.size(); j++) {
-//                    builder.append(iterator.get()).append(", ");
-//                    iterator.next();
-//                }
-//            }
-//        }
-
         for (LinkedList<T> list: lists) {
             ListIterator<T> iterator = null;
             if (list != null && !list.isEmpty()) {
