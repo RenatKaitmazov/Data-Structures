@@ -243,7 +243,7 @@ public final class LinkedList<T> implements List<T> {
                 /* Searching */
 
     public T find(T key) {
-        checkEmptiness();
+        if (isEmpty()) return null;
 
         Link<T> current = head;
 
