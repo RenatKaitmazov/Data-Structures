@@ -11,7 +11,7 @@ import java.lang.reflect.Array;
  * It uses double hashing method to find an appropriate place for an element to be stored in the array
  */
 
-public final class OASet<T> {
+public final class OASet<T> implements Set<T> {
     /**
      * This class is going to be used as a wrapper for storing data.
      * It has an important boolean field we are going to use when deleting items.
