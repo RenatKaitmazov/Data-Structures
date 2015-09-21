@@ -7,6 +7,93 @@ import java.lang.reflect.Array;
  */
 
 public final class RedBlackBST<T extends Comparable<T>> {
+
+    /** This part is for SortedMap **/
+    /************************************************************/
+    private static class Item<K extends Comparable<K>, V> implements Comparable<Item<K, V>> {
+        private K key;
+        private V value;
+
+        public Item(K key, V value) {
+            this.key = key;
+            this.value = value;
+        }
+
+        @Override
+        public String toString() { return String.format("%s=%s", key.toString(), value.toString()); }
+
+        public void setValue(V value) { this.value = value; }
+
+        public int compareTo(Item<K, V> item) {
+            if (key.compareTo(item.key) > 0) return 1;
+            if (key.compareTo(item.key) < 0) return -1;
+            return 0;
+        }
+    }
+
+    public static class RBTreeDecorator<K extends Comparable<K>, V> {
+        private Class keyClass;
+        private Class valueClass;
+        private RedBlackBST<Item<K, V>> storage = new RedBlackBST<>();
+
+        @Override
+        public String toString() { return storage.toString(); }
+
+        public boolean isEmpty() { return storage.isEmpty(); }
+        public int size() { return storage.size(); }
+        public boolean contains(K key) { return find(key) != null; }
+
+        private Item<K, V> find(K key) {
+            if (isEmpty()) return null;
+
+            Node<Item<K,V>> node = storage.root;
+
+            while (node != null) {
+                if (node.data().key.equals(key)) return node.data();
+                if (node.data().key.compareTo(key) > 0) node = node.leftChild();
+                else node = node.rightChild();
+            }
+
+            return null;
+        }
+
+        public V get(K key) {
+            Item<K, V> item = find(key);
+            return item != null ? item.value : null;
+        }
+
+        public void insert(K key, V value) {
+            keyClass = key.getClass();
+            valueClass = value.getClass();
+            Item<K, V> oldValue = find(key);
+            if (oldValue == null) storage.insert(new Item<K, V>(key, value));
+            else {
+                oldValue.setValue(value);
+            }
+        }
+
+        public V delete(K key) {
+            Item<K, V> itemToDelete = find(key);
+            return itemToDelete != null ? storage.delete(itemToDelete).value : null;
+        }
+
+        public K[] keySet() {
+            K[] keys = (K[]) Array.newInstance(keyClass, size());
+            int i = 0;
+            for (Item<K, V> item: storage.toArray()) keys[i++] = item.key;
+            return keys;
+        }
+
+        public V[] values() {
+            V[] values = (V[]) Array.newInstance(valueClass, size());
+            int i = 0;
+            for (Item<K, V> item: storage.toArray()) values[i++] = item.value;
+            return values;
+        }
+    }
+                    /** This part is for SortedMap **/
+    /**********************************************************/
+
     private Node<T> root;
     private int count = 0;
     private Class clazz; // Need it for toArray() method
